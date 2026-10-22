@@ -38,7 +38,7 @@ const SignUpForm = () => {
   const { isSignedIn } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [verifying, setVerifying] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -74,7 +74,7 @@ const SignUpForm = () => {
       console.error('Sign-up error:', JSON.stringify(error, null, 2));
       setAuthError('An error occurred during sign-up. Please try again.');
     } else {
-      setVerifying(true);
+      setIsVerifying(true);
       await signUp.verifications.sendEmailCode();
     }
 
@@ -91,14 +91,19 @@ const SignUpForm = () => {
     setIsSubmitting(true);
     setVerificationError(null);
 
-    try {
-      await signUp.verifications.verifyEmailCode({
-        code: verificationCode,
-      });
+    const { error } = await signUp.verifications.verifyEmailCode({
+      code: verificationCode,
+    });
 
+    if (error) {
+      console.error('Verification error:', JSON.stringify(error, null, 2));
+      setVerificationError('An error occurred during verification. Please try again.');
+    } else {
       if (signUp.status === 'complete') {
+        setIsVerifying(false);
         await signUp.finalize({
           // Redirect the user to the dashboard page after signing up
+          // You can customize this URL based on your application's routing.
           navigate: ({ decorateUrl }) => {
             const url = decorateUrl('/dashboard');
             if (url.startsWith('http')) {
@@ -108,19 +113,13 @@ const SignUpForm = () => {
             }
           },
         });
-      } else {
-        console.error('Verification incomplete:', signUp);
-        setVerificationError('Verification could not be completed. Please try again.');
       }
-    } catch (error) {
-      console.error('Verification error:', JSON.stringify(error, null, 2));
-      setVerificationError('An error occurred during verification. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
+
+    setIsSubmitting(false);
   };
 
-  if (verifying) {
+  if (isVerifying) {
     return (
       <Card className='w-full max-w-md border border-default-200 bg-default-50 shadow-xl'>
         <Card.Header className='flex flex-col gap-1 items-center pb-2'>
