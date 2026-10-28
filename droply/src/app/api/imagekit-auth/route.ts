@@ -10,6 +10,7 @@ export const GET = async () => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Get upload auth params
     const { token, expire, signature } = getUploadAuthParams({
       privateKey: process.env.IMAGEKIT_PRIVATE_KEY as string, // Never expose this on client side
       publicKey: process.env.IMAGEKIT_PUBLIC_KEY as string,

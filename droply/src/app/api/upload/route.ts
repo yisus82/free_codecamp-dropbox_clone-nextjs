@@ -33,7 +33,7 @@ export const POST = async (request: NextRequest) => {
       type: imagekit.fileType || 'image',
       fileUrl: imagekit.url,
       thumbnailUrl: imagekit.thumbnailUrl || null,
-      userId: userId,
+      userId,
       parentId: null, // Root level by default
       isFolder: false,
       isStarred: false,
