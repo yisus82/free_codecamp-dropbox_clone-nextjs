@@ -96,7 +96,7 @@ export const POST = async (request: NextRequest) => {
     // Create folder path based on parent folder if exists
     const folderPath = parentId ? `/droply/${userId}/folders/${parentId}` : `/droply/${userId}`;
 
-    // Retrieve authentication parameters for the upload.
+    // Retrieve authentication parameters for the upload operation from ImageKit
     let authParams;
     try {
       authParams = await authenticate();
@@ -107,7 +107,7 @@ export const POST = async (request: NextRequest) => {
     const { signature, expire, token, publicKey } = authParams;
 
     try {
-      // Call the ImageKit SDK upload function with the required parameters and callbacks.
+      // Call the ImageKit SDK upload function with the required parameters and callbacks
       const uploadResponse = await upload({
         expire,
         token,
