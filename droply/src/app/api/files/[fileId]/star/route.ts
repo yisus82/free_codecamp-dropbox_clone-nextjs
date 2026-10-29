@@ -36,10 +36,16 @@ export const PATCH = async (
       .set({ isStarred: !file.isStarred })
       .where(and(eq(files.id, fileId), eq(files.userId, userId)))
       .returning();
+    const updatedFile = updatedFiles[0];
+    const action = updatedFile.isStarred ? 'starred' : 'unstarred';
 
-    return NextResponse.json(updatedFiles[0]);
+    console.log(`File ${fileId} was ${action} successfully by user ${userId}.`);
+    return NextResponse.json(
+      { message: `File ${action} successfully`, file: updatedFile },
+      { status: 200 },
+    );
   } catch (error) {
-    console.error('Error starring file:', error);
+    console.error('Error updating file:', error);
     return NextResponse.json({ error: 'Failed to update file' }, { status: 500 });
   }
 };
